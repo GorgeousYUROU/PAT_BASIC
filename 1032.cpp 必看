@@ -1,0 +1,143 @@
+// 1034. 有理数四则运算(20)
+// 本题要求编写程序，计算2个有理数的和、差、积、商。
+
+// 输入格式：
+
+// 输入在一行中按照“a1/b1 a2/b2”的格式给出两个分数形式的有理数，其中分子和分母全是整型范围内的整数，负号只可能出现在分子前，分母不为0。
+
+// 输出格式：
+
+// 分别在4行中按照“有理数1 运算符 有理数2 = 结果”的格式顺序输出2个有理数的和、差、积、商。注意输出的每个有理数必须是该有理数的最简形式“k a/b”，其中k是整数部分，a/b是最简分数部分；若为负数，则须加括号；若除法分母为0，则输出“Inf”。题目保证正确的输出中没有超过整型范围的整数。
+
+// 输入样例1：
+// 2/3 -4/2
+// 输出样例1：
+// 2/3 + (-2) = (-1 1/3)
+// 2/3 - (-2) = 2 2/3
+// 2/3 * (-2) = (-1 1/3)
+// 2/3 / (-2) = (-1/3)
+// 输入样例2：
+// 5/3 0/6
+// 输出样例2：
+// 1 2/3 + 0 = 1 2/3
+// 1 2/3 - 0 = 1 2/3
+// 1 2/3 * 0 = 0
+// 1 2/3 / 0 = Inf
+
+#include<iostream>
+#include<stdio.h>
+using namespace std;
+int gcd(int m,int n)
+{
+    int t,r,temp=m;
+    if(n==0) return 0;
+    if(m<n){t=m;m=n;n=t;}
+    while(n!=0)
+    {
+        r=m%n;
+        m=n;
+        n=r;
+    }
+    return m;
+}
+
+void print1(long k2,long second1,long second2)
+{
+    if(second1>0&&second2<0) {second1=-second1;second2=-second2;}
+    if(second1<0&&second2<0) {second1=-second1;second2=-second2;}
+    if(k2<0||second1<0) cout<<"(";
+    if(k2!=0) cout<<k2;
+    if(second1!=0)
+    {
+    if(k2!=0) cout<<" ";
+    if(k2<0) cout<<-second1<<"/"<<second2;
+    else cout<<second1<<"/"<<second2;
+    }
+    if(k2<0||second1<0) cout<<")";
+    if((second1==0)&&(k2==0))cout<<"0";
+
+}
+
+void print(int k1,int k2,int first1,int first2,int second1,int second2,int i)
+{
+    char *flag="+-*/";
+    print1(k1,first1,first2);
+    cout<<" "<<flag[i]<<" ";
+    print1(k2,second1,second2);
+    cout<<" = ";
+
+
+}
+
+
+
+void simplify(long &k1,long &first1,long &first2)
+{
+	k1=first1/first2;
+    if(k1!=0)
+    {
+        first1=first1%first2;
+    }
+    if(first1!=0)
+    {
+    long fen1;
+    if(first1<0)
+    fen1=gcd(first2,-first1);
+    else
+    fen1=gcd(first2,first1);
+    if(fen1>1)
+    {
+        first2/=fen1;
+        first1/=fen1;
+    }
+    }
+}
+int main()
+{
+    long first1,first2,k1;
+    //first
+    scanf("%ld/%ld",&first1,&first2);
+    simplify(k1,first1,first2);
+    //second
+    long second1,second2,k2;
+    scanf("%ld/%ld",&second1,&second2);
+    simplify(k2,second1,second2);
+
+    //sum
+    long sum2=second2*first2;
+    long sum1=second2*first1+second1*first2+(k1+k2)*sum2;
+    long k=sum1/sum2;
+    simplify(k,sum1,sum2);
+    print(k1,k2,first1,first2,second1,second2,0);
+    print1(k,sum1,sum2);
+    cout<<endl;
+
+    //minus
+    sum2=second2*first2;
+    sum1=second2*first1-second1*first2+(k1-k2)*sum2;
+    k=sum1/sum2;
+    simplify(k,sum1,sum2);
+    print(k1,k2,first1,first2,second1,second2,1);
+    print1(k,sum1,sum2);
+    cout<<endl;
+
+    //mul
+    sum1=((k1*first2)+first1)*((k2*second2)+second1);
+    sum2=second2*first2;
+    k=sum1/sum2;
+    simplify(k,sum1,sum2);
+    print(k1,k2,first1,first2,second1,second2,2);
+    print1(k,sum1,sum2);
+    cout<<endl;
+
+    //divide
+    sum1=((k1*first2)+first1)*second2;
+    sum2=((k2*second2)+second1)*first2;
+    if(((k2*second2)+second1)==0) {print(k1,k2,first1,first2,second1,second2,3);cout<<"Inf"<<endl;return 0;}
+    k=sum1/sum2;
+    simplify(k,sum1,sum2);
+    print(k1,k2,first1,first2,second1,second2,3);
+    print1(k,sum1,sum2);
+    cout<<endl;
+return 0;
+}
